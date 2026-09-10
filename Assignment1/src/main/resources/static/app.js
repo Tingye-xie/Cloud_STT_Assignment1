@@ -14,16 +14,17 @@ startButton.addEventListener("click", async() => {
 		 recorder.start();
 		//change the default status to recording....
 		status.textContent = "Recording";
-		//disable start because prevent user pressing twice and activate the stopbutton
+		//disable start to prevent user pressing start twice and activate the stopbutton.
 		startButton.disabled = true;
 		stopButton.disabled = false;
 		
 		//reset the array here if want to save another audio.
 		audio_chunks = [];
-		
 		recorder.addEventListener("dataavailable", (event) => {
 			if(event.data.size > 0)
-				{audio_chunks.push(event.data)}
+				{
+					audio_chunks.push(event.data)
+				}
 		});
 		
 	} catch (error) {
@@ -35,8 +36,22 @@ stopButton.addEventListener("click", async() => {
 	
 		if(!microphone)
 			return;
-		//stops the recording
-		recorder.stop();
+		//stop the recorder;
+			recorder.stop();
+		//wait for it to actually finishes than stop the record
+		recorder.addEventListener("stop",(event)=>{
+			//combine all chunks into one audion in webm type
+			const audio = new Blob(audio_chunks,{type: "audio/webm"}); 
+			//create aq fake url to access the audio
+			const audioUrl = URL.createObjectURL(audio);
+			//create a link in html
+			link = document.createElement("a");
+			link.href = audioUrl;
+			link.download = "recording.webm";
+			document.body.appendChild(link);
+			link.textContent = "DownloadAudio";
+		});
+
 		//only disconnet the microphone
 		microphone.getTracks().forEach((track) => track.stop());
 		// Clears the variable.
