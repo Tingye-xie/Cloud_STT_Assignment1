@@ -44,12 +44,7 @@ stopButton.addEventListener("click", async() => {
 			const audio = new Blob(audio_chunks,{type: "audio/webm"}); 
 			//create aq fake url to access the audio
 			const audioUrl = URL.createObjectURL(audio);
-			//create a link in html
-			link = document.createElement("a");
-			link.href = audioUrl;
-			link.download = "recording.webm";
-			document.body.appendChild(link);
-			link.textContent = "DownloadAudio";
+
 		});
 
 		//only disconnet the microphone
