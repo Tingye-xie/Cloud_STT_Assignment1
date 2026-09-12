@@ -44,8 +44,20 @@ stopButton.addEventListener("click", async() => {
 			const audio = new Blob(audio_chunks,{type: "audio/webm"}); 
 			//create aq fake url to access the audio
 			const audioUrl = URL.createObjectURL(audio);
-
-		});
+			
+			
+			//1. is to match the param name in controller, 2. the blob just created 3. the filename for the form
+			const formData = new FormData();
+			formData.append("audio", audio,"recording.webm")
+			
+			fetch("http://localhost:8080/api/v1/transcriptions", {
+				method:"Post", // to match the correct method in controller
+				body: formData}) // choose the speicific data to send
+			//then happens after successfully requested
+			.then(res => res.text()) //after data is fetched transfer the data into text
+			.then(data => console.log(data)); //after transfer to text, display it in the console
+			});
+		
 
 		//only disconnet the microphone
 		microphone.getTracks().forEach((track) => track.stop());
