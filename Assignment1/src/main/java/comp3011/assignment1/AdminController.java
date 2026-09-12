@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
-
 @RestController
 public class AdminController {
 	// StartTime is captured once when the system starts running, so the time is fixed
@@ -75,6 +73,26 @@ public ResponseEntity<?> getShutdownResponse() {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
 	}
 	}
+
+
+@GetMapping("/api/v1/global/stats")
+public ResponseEntity<?> getGlobalStats() {
+	try {
+	GlobalStats stats = new GlobalStats();
+	return ResponseEntity.ok(stats);
+	//capture run time failure 500
+	} catch (Exception e){
+		ErrorResponse error = new ErrorResponse();
+		error.message = e.getMessage();
+		error.path = "/api/v1/global/stats";
+		error.status = 500;
+		error.timestamp = Instant.now().toString();
+		error.error = "Internal Server Error";
+		//this is the full way of writing for all status code except 200 using OK.()
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+	}
 }
+}
+
 
     
