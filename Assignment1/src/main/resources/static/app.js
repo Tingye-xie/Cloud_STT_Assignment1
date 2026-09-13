@@ -46,7 +46,7 @@ stopButton.addEventListener("click", async() => {
 			const audioUrl = URL.createObjectURL(audio);
 			
 			
-			//1. is to match the param name in controller, 2. the blob just created 3. the filename for the form
+			//1. is to match the param name in controller, 2. the blob just created 3. create filename for the form that has the audio
 			const formData = new FormData();
 			formData.append("audio", audio,"recording.webm")
 			
