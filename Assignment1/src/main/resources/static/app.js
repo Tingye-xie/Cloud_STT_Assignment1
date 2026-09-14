@@ -2,9 +2,10 @@ const startButton = document.getElementById("startButton");
 //find the id in html to determine the behaviour for that button
 const stopButton = document.getElementById("stopButton");
 const status = document.getElementById("status");
+let transcription = document.getElementById("transcript");
 let microphone;
 let recorder;
-let audio_chucks  = [];
+let audio_chunks  = [];
 
 
 startButton.addEventListener("click", async() => {
@@ -42,20 +43,18 @@ stopButton.addEventListener("click", async() => {
 		recorder.addEventListener("stop",(event)=>{
 			//combine all chunks into one audion in webm type
 			const audio = new Blob(audio_chunks,{type: "audio/webm"}); 
-			//create aq fake url to access the audio
-			const audioUrl = URL.createObjectURL(audio);
 			
 			
 			//1. is to match the param name in controller, 2. the blob just created 3. create filename for the form that has the audio
 			const formData = new FormData();
 			formData.append("audio", audio,"recording.webm")
 			
-			fetch("http://localhost:8080/api/v1/transcriptions", {
+			fetch("http://localhost:8080/api/v1/transcriptions", { //options
 				method:"Post", // to match the correct method in controller
 				body: formData}) // choose the speicific data to send
 			//then happens after successfully requested
 			.then(res => res.text()) //after data is fetched transfer the data into text
-			.then(data => console.log(data)); //after transfer to text, display it in the console
+			.then(data => { transcription.textContent = data}); // //after transfer to text display to user interface
 			});
 		
 
