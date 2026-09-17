@@ -8,12 +8,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
+
 @RestController
 public class AdminController {
+	private final TokenUsageTracker tokenUsageTracker;
 	// StartTime is captured once when the system starts running, so the time is fixed
-Instant StartTime = Instant.now();
-//set initial status for the service status
-boolean isShuttingDown = false;
+	Instant StartTime = Instant.now();
+	//set initial status for the service status
+	boolean isShuttingDown = false;
+
+	public AdminController(TokenUsageTracker tokenUsageTracker) {
+	    this.tokenUsageTracker = tokenUsageTracker;
+	}
 	
 @GetMapping("/api/v1/admin/uptime")
 public ResponseEntity<?> getUpTime() {
@@ -78,8 +85,11 @@ public ResponseEntity<?> getShutdownResponse() {
 @GetMapping("/api/v1/global/stats")
 public ResponseEntity<?> getGlobalStats() {
 	try {
-	GlobalStats stats = new GlobalStats();
-	return ResponseEntity.ok(stats);
+		GlobalStats stats = new GlobalStats();
+		// read the running totals accumulated across all transcription requests
+		stats.inputTokens = tokenUsageTracker.getInputTokens();
+		stats.outputTokens = tokenUsageTracker.getOutputTokens();
+		return ResponseEntity.ok(stats);
 	//capture run time failure 500
 	} catch (Exception e){
 		ErrorResponse error = new ErrorResponse();

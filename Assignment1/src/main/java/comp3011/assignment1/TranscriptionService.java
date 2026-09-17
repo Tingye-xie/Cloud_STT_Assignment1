@@ -16,9 +16,12 @@ public class TranscriptionService {
 	private final RestClient client = RestClient.create();
 	//tool used later to parse the JSON string returned by OpenAI
 	private final ObjectMapper objectmapper = new ObjectMapper();
+	private final TokenUsageTracker tokenUsageTracker;
+	
 	//value gets the API from the configure so i don't have to write it in the source code
-	public TranscriptionService(@Value("${openai.api.key}") String apiKey) {
+	public TranscriptionService(@Value("${openai.api.key}") String apiKey, TokenUsageTracker tokenUsageTracker) {
 		this.apiKey = apiKey;
+		this.tokenUsageTracker = tokenUsageTracker;
 	}
 	
 	public String transcribe(MultipartFile audioFile) 
@@ -43,6 +46,10 @@ public class TranscriptionService {
 		}
 		// parse the raw JSON string from OpenAI into a queryable object, so text and usage can be pulled out separately
 		JsonNode root = objectmapper.readTree(rawResponse);
+		long inputTokensUsed = root.path("usage").path("input_tokens").asLong(0);
+		long outputTokensUsed = root.path("usage").path("output_tokens").asLong(0);
+		// accumulate token usage globally, separate from the text returned to the client
+		tokenUsageTracker.record(inputTokensUsed, outputTokensUsed);
 		return root.path("text").asString();
 		}
 	}
