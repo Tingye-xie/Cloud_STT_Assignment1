@@ -34,7 +34,7 @@ startButton.addEventListener("click", async() => {
 	});
 
 stopButton.addEventListener("click", async() => {
-	
+		transcription.textContent = "Transcription in Progress";
 		if(!microphone)
 			return;
 		//stop the recorder;
