@@ -10,18 +10,28 @@ import org.springframework.web.multipart.MultipartFile;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+
 @Service
 public class TranscriptionService {
 	private final String apiKey;
-	private final RestClient client = RestClient.create();
 	//tool used later to parse the JSON string returned by OpenAI
 	private final ObjectMapper objectmapper = new ObjectMapper();
 	private final TokenUsageTracker tokenUsageTracker;
+	private final RestClient client;
 	
 	//value gets the API from the configure so i don't have to write it in the source code
 	public TranscriptionService(@Value("${openai.api.key}") String apiKey, TokenUsageTracker tokenUsageTracker) {
 		this.apiKey = apiKey;
 		this.tokenUsageTracker = tokenUsageTracker;
+		
+		// asked AI for help configuring timeouts on the RestClient's underlying HTTP factory,
+		// so a stuck OpenAI call can't hold a thread forever
+		SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+		factory.setConnectTimeout(5000);
+		factory.setReadTimeout(15000);
+		this.client = RestClient.builder().requestFactory(factory).build();
+		
 	}
 	
 	public String transcribe(MultipartFile audioFile) 
