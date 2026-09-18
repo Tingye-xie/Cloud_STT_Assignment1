@@ -36,7 +36,9 @@ public ResponseEntity<?> getUpTime() {
 	//get the current time
 	uptime.utcNow = Instant.now().toString();
 	//capture the UpTime using Duration which subtracts b -a
-	uptime.serverUptimeSeconds = Duration.between(StartTime,Instant.now()).getSeconds();
+	Duration elapsed = Duration.between(StartTime,Instant.now());
+	//after capturing it, get seconds + get_Nano to have a decimal point
+	uptime.serverUptimeSeconds = elapsed.getSeconds() + elapsed.getNano() / 1_000_000_000.0;
 	//allows return more than 1 return type
 	return ResponseEntity.ok(uptime);
 	//capture run time failure 500
