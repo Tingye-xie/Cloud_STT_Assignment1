@@ -1,7 +1,9 @@
 package comp3011.assignment1;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,14 +14,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class AdminController {
+	//dependency injection to track tokens and shutdown the server
 	private final TokenUsageTracker tokenUsageTracker;
+	private final ConfigurableApplicationContext context;
 	// StartTime is captured once when the system starts running, so the time is fixed
 	Instant StartTime = Instant.now();
-	//set initial status for the service status
-	boolean isShuttingDown = false;
+	//set initial status for the service status and use atomic to avoid concurrency
+	private final AtomicBoolean isShuttingDown = new AtomicBoolean(false);
 
-	public AdminController(TokenUsageTracker tokenUsageTracker) {
+	public AdminController(TokenUsageTracker tokenUsageTracker, ConfigurableApplicationContext context) {
 	    this.tokenUsageTracker = tokenUsageTracker;
+	    this.context = context;
 	}
 	
 @GetMapping("/api/v1/admin/uptime")
@@ -52,10 +57,20 @@ public ResponseEntity<?> getShutdownResponse() {
 
 	ShutdownResponse downTimeMessage = new ShutdownResponse();
 	try {
-	if(!isShuttingDown) {
+		// atomically flips isShuttingDown from false to true; only the first caller succeeds
+	if(isShuttingDown.compareAndSet(false, true)) {
 		// change it to shutdown so any repeat requests are treated as a conflict
-	isShuttingDown = true;
 	downTimeMessage.message = "Graceful shutdown requested.";
+	 // delay the actual shutdown so this response has time to reach the client first to display the success shut down
+    new Thread(() -> {
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        context.close();
+    }).start();
+	
 	return ResponseEntity.status(HttpStatus.ACCEPTED).body(downTimeMessage);
 	}
 	else {
