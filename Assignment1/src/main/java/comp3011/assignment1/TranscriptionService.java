@@ -10,7 +10,9 @@ import org.springframework.web.multipart.MultipartFile;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import java.net.http.HttpClient;
+import java.time.Duration;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 
 @Service
 public class TranscriptionService {
@@ -25,12 +27,18 @@ public class TranscriptionService {
 		this.apiKey = apiKey;
 		this.tokenUsageTracker = tokenUsageTracker;
 		
-		// asked AI for help configuring timeouts on the RestClient's underlying HTTP factory,
-		// so a stuck OpenAI call can't hold a thread forever
-		SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-		factory.setConnectTimeout(5000);
-		factory.setReadTimeout(15000);
-		this.client = RestClient.builder().requestFactory(factory).build();
+		// asked Claude for help swapping to JDK's HttpClient-based factory,
+		// since the old SimpleClientHttpRequestFactory caps concurrent connections
+		// to the same host (OpenAI) at a low default, which would bottleneck under load
+		HttpClient httpClient = HttpClient.newBuilder()
+			    .connectTimeout(Duration.ofSeconds(5))
+			    .build();
+			
+			
+			JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(httpClient);
+			factory.setReadTimeout(Duration.ofSeconds(15));
+
+			this.client = RestClient.builder().requestFactory(factory).build();
 		
 	}
 	
