@@ -12,7 +12,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 
-public class AdminControllerTest {
+public class ShutDownTest {
 	//pass into the controller object
 	TokenUsageTracker tokenUsageTracker = new TokenUsageTracker();
 	// fake context so that context.close() does nothing - a real one would kill the test JVM
