@@ -12,6 +12,9 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 
+import comp3011.assignment1.controller.AdminController;
+import comp3011.assignment1.service.TokenUsageTracker;
+
 public class ShutDownTest {
 	//pass into the controller object
 	TokenUsageTracker tokenUsageTracker = new TokenUsageTracker();

@@ -1,4 +1,4 @@
-package comp3011.assignment1;
+package comp3011.assignment1.dto;
 
 public class ErrorResponse {
 		public String timestamp;
