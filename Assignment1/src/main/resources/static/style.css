@@ -1,0 +1,93 @@
+
+html {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+
+body {
+    font-family: system-ui, sans-serif;
+    width: 90%;
+    max-width: 440px;
+    margin: 40px auto;
+    padding: 32px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    text-align: center;
+    color: #222;
+}
+
+h1 {
+    margin-bottom: 4px;
+    color: #4c2a85;
+}
+
+h1 + p {
+    color: #777;
+    margin-top: 0;
+    margin-bottom: 28px;
+}
+
+
+button {
+    font-size: 16px;
+    font-weight: 600;
+    padding: 12px 24px;
+    margin: 0 6px;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 4px 12px rgba(118, 75, 162, 0.4);
+}
+
+
+button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(118, 75, 162, 0.5);
+}
+
+
+button:disabled {
+    background: #d5d5dd;
+    color: #888;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+#startButton::before {
+    content: "\1F3A4  ";
+}
+
+#stopButton::before {
+    content: "\23F9  ";
+}
+
+#status {
+    display: inline-block;
+    margin-top: 24px;
+    padding: 6px 16px;
+    border-radius: 20px;
+    background-color: #f0eefc;
+    color: #4c2a85;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+#transcript {
+    margin-top: 20px;
+    padding: 18px;
+    min-height: 90px;
+    background-color: #fafafa;
+    border: 1px solid #e2e2e2;
+    border-radius: 12px;
+    text-align: left;
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
