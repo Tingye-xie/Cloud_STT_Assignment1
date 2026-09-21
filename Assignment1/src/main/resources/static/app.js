@@ -54,7 +54,9 @@ stopButton.addEventListener("click", async() => {
 				body: formData}) // choose the speicific data to send
 			//then happens after successfully requested
 			.then(res => res.text()) //after data is fetched transfer the data into text
-			.then(data => { transcription.textContent = data}); // //after transfer to text display to user interface
+			.then(data => { transcription.textContent = data}) // //after transfer to text display to user interface
+			//if fetch or anything fails (server down, network error), show a failure message instead of hanging on in progress
+			.catch(error => { transcription.textContent = "Transcription failed."; console.error(error); });
 			});
 		
 

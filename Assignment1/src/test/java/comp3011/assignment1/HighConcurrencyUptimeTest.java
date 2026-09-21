@@ -58,7 +58,7 @@ public class HighConcurrencyUptimeTest {
 	    
 	    Instant start = Instant.now();
 	    
-	    for (int i = 0; i < 200; i++) {
+	    for (int i = 0; i < 220; i++) {
 	        Thread t = new Thread(task);
 	        threads.add(t);
 	        t.start();
@@ -70,7 +70,7 @@ public class HighConcurrencyUptimeTest {
 	    
 	    Duration elapsed = Duration.between(start, Instant.now());
 
-	    assertEquals(200, successCount.get());
+	    assertEquals(220, successCount.get());
 	    assertTrue(elapsed.toMillis() < 5000);
 	    
 
