@@ -37,10 +37,12 @@ stopButton.addEventListener("click", async() => {
 		transcription.textContent = "Transcription in Progress";
 		if(!microphone)
 			return;
-		//stop the recorder;
-			recorder.stop();
-		//wait for it to actually finishes than stop the record
-		recorder.addEventListener("stop",(event)=>{
+		//wrap the event-based recorder.stop() in a Promise so we can await it
+		  const recordingStopped = new Promise((resolve) => {
+		      recorder.addEventListener("stop", resolve);
+		  });
+		  recorder.stop();
+		  await recordingStopped;
 			//combine all chunks into one audion in webm type
 			const audio = new Blob(audio_chunks,{type: "audio/webm"}); 
 			
@@ -49,15 +51,17 @@ stopButton.addEventListener("click", async() => {
 			const formData = new FormData();
 			formData.append("audio", audio,"recording.webm")
 			
-			fetch("http://localhost:8080/api/v1/transcriptions", { //options
-				method:"Post", // to match the correct method in controller
-				body: formData}) // choose the speicific data to send
-			//then happens after successfully requested
-			.then(res => res.text()) //after data is fetched transfer the data into text
-			.then(data => { transcription.textContent = data}) // //after transfer to text display to user interface
-			//if fetch or anything fails (server down, network error), show a failure message instead of hanging on in progress
-			.catch(error => { transcription.textContent = "Transcription failed."; console.error(error); });
-			});
+			try {
+			       const response = await fetch("http://localhost:8080/api/v1/transcriptions", {
+			           method: "POST",
+			           body: formData
+			       });
+			       const data = await response.text(); //read the response body as plain text
+			       transcription.textContent = data; //display the transcript
+			   } catch (error) {
+			       transcription.textContent = "Transcription failed."; //shows the error message if fetch failed
+			       console.error(error);
+			   }
 		
 
 		//only disconnet the microphone
