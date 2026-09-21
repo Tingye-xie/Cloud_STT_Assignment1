@@ -5,6 +5,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import java.time.Instant;
+
 @RestController
 public class TranscriptionController {
 	
@@ -17,12 +21,22 @@ public class TranscriptionController {
 	
 	// @RequestParam("audio") tells Spring to pull the file named "audio" from the incoming multi-part request and bind it to audioFile。
 	@PostMapping("/api/v1/transcriptions")
-	public String getAudio(@RequestParam("audio") MultipartFile audioFile)
+	public ResponseEntity<?> getAudio(@RequestParam("audio") MultipartFile audioFile)
 	{
-	//return what service return to controller to client
-	return transcriptionService.transcribe(audioFile);
 	
-	}
+	    try {
+	        String text = transcriptionService.transcribe(audioFile);
+	        return ResponseEntity.ok(text);
+	    } catch (Exception e) {
+	        ErrorResponse error = new ErrorResponse();
+	        error.message = e.getMessage();
+	        error.path = "/api/v1/transcriptions";
+	        error.status = 500;
+	        error.timestamp = Instant.now().toString();
+	        error.error = "Internal Server Error";
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+	    	}
 	
+}
 }
 

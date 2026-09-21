@@ -43,8 +43,8 @@ public class TranscriptionService {
 	}
 	
 	public String transcribe(MultipartFile audioFile) 
-	{			String rawResponse;
-		try {
+	{			
+		
 			// body(audioFile) didn't work as OpenAi needs multi-part/form-data.
 			//So i made Claude's help me to build a MultiValueMap than just body(body) which worked yeah.
 	        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
@@ -52,16 +52,14 @@ public class TranscriptionService {
 	        body.add("model", "gpt-4o-mini-transcribe");
 	        
 	        //save it in a variable instead of just return it
-			 rawResponse =  client.post()
+			 String rawResponse =  client.post()
 				.uri("https://api.openai.com/v1/audio/transcriptions")
 				//all request to third parties that needs a API will need this type of header
 				.header("Authorization", "Bearer " + apiKey)
 				.body(body)
 				.retrieve()
 				.body(String.class);
-		} catch(Exception e) {
-			return "ERROR: " + e.getMessage();
-		}
+	
 		// parse the raw JSON string from OpenAI into a queryable object, so text and usage can be pulled out separately
 		JsonNode root = objectmapper.readTree(rawResponse);
 		long inputTokensUsed = root.path("usage").path("input_tokens").asLong(0);
